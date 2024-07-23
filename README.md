@@ -1,7 +1,7 @@
-## PHARvis
+# PHARvis
  Methods for visualizing pharlap raytracing results in MATLAB
 
-# IONS.m
+## IONS.m
  Class containing all necessary elements of Ionosphere
 
 __Initialization:__
@@ -29,9 +29,12 @@ ground_range = rps.(props(1));
 geometric_path_length = rps.(props(2));
 ```
 
-# Figures:
+## Figures:
 
 ![image](https://github.com/user-attachments/assets/1ba732ba-6a95-4ca9-b509-5b3559bb1d50)
 
 ![image](https://github.com/user-attachments/assets/f74e276b-35e5-4c06-a94a-526b52f73b77)
+
+![image](https://github.com/user-attachments/assets/860842b1-ca98-4f0b-bc81-07f8e993dcb3)
+
 
