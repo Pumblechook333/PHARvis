@@ -363,8 +363,15 @@ classdef IONS
                             in_range = self.chk_dist(range, ray_N(elev), wgs84) == 1;
                             if in_range
                                 for p = 1:nprops
-                                    ray_props(p, elev) = ...
-                                            ray_N(elev).(props(p))(end);
+%                                     ray_props(p, elev) = ...
+%                                             ray_N(elev).(props(p))(end);
+                                    if props(p,2) == 'ray'
+                                        ray_props(p, elev) = ...
+                                                ray_N(elev).(props(p))(end);
+                                    else
+                                        ray_props(p, elev) = ...
+                                                  sum(ray_data_N(elev).(props(p)));
+                                    end
                                 end
                             end
                         end
