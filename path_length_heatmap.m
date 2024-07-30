@@ -46,6 +46,9 @@ TX_coord = c.TX_coord;
 
 ray_bears = obj.get_bearing();
 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Raytracing
+
 props = [["ground_range", "ray_data"];
          ["geometric_path_length", "ray_data"]];
 rps = obj.ray_props(props);

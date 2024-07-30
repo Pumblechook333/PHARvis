@@ -20,6 +20,8 @@ classdef IONS
         elevs
         freqs           % Frequency (MHz)
         R12
+        mode
+        nhops_max = 4;
         
         % Coords
         origin_lat      % latitude of the start point of rays
@@ -38,6 +40,10 @@ classdef IONS
         
         % gl_iono
         iono_series = struct();
+        
+        % Ray Breakdown
+        per_tot = 0;
+        per_hop = struct();
         
     end
     
@@ -70,22 +76,26 @@ classdef IONS
             end
             
         end
+        
     end
     
     methods
         % Initialization
-        function self = IONS(date, elevs, freq, R12, gen)
+        function self = IONS(date, elevs, freq, R12, mode, gen, brk)
             arguments
                 date = [2021 7 1 0 0]
                 elevs = 0:5:90
                 freq = 10
                 R12 = -1
+                mode = 1
                 gen = 0
+                brk = true
             end
             %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             % General Parameters
             
             self.R12 = R12;
+            self.mode = mode;
 
             % Generate an Ionosphere for each hour
             self.date = date;           % yyyy m d 0 0
@@ -102,6 +112,12 @@ classdef IONS
             self = self.bearing();
             self = self.iono_parms();
             self = self.gl_iono(gen);
+            
+            if brk 
+                tmp_props = [["ground_range", "ray_data"]];
+                tmp_rps = self.ray_props(tmp_props);
+                self = self.ray_breakdown(tmp_props, tmp_rps);
+            end
         end
         
         % Setters
@@ -301,12 +317,13 @@ classdef IONS
         
         function res = ray_props(self, props)
             arguments
-                self;
+                self
                 
-                props;
+                props
             end
             
-            nprops = props.length;
+            sz = size(props);
+            nprops = sz(1);
             
             rsta = 1;
             rinc = 1;
@@ -314,9 +331,6 @@ classdef IONS
 
             tol = [1e-7 0.01 25];       % ODE solver tolerance and min max stepsizes
             num_elevs = length(self.elevs); 
-
-            % OX_mode - polarization mode of rays: 1 = O, -1 = X, 0 = no field
-            OX_mode = 1;
             
             return_properties = struct();
             for p = 1:nprops
@@ -325,9 +339,8 @@ classdef IONS
 
             range = 100;
             wgs84 = wgs84Ellipsoid('km');
-
-            nhop_max = 4;
-            for nhops = 1:1:nhop_max
+            
+            for nhops = 1:1:self.nhops_max
                 hop_field = "hop_" + nhops;
                 
                 tmp = zeros(rsto,num_elevs);
@@ -349,7 +362,7 @@ classdef IONS
 
                     [ray_data_N, ray_N, ~] = ...
                       raytrace_3d(self.origin_lat, self.origin_lon, self.origin_ht, self.elevs, self.ray_bears, self.freqs, ...
-                                  OX_mode, nhops, tol, iono_en_grid, iono_en_grid_5, ...
+                                  self.mode, nhops, tol, iono_en_grid, iono_en_grid_5, ...
                                   collision_freq, self.iono_grid_parms, Bx, By, Bz, ...
                                   self.geomag_grid_parms);
                     
@@ -363,9 +376,7 @@ classdef IONS
                             in_range = self.chk_dist(range, ray_N(elev), wgs84) == 1;
                             if in_range
                                 for p = 1:nprops
-%                                     ray_props(p, elev) = ...
-%                                             ray_N(elev).(props(p))(end);
-                                    if props(p,2) == 'ray'
+                                    if props(p,2) == "ray"
                                         ray_props(p, elev) = ...
                                                 ray_N(elev).(props(p))(end);
                                     else
@@ -396,6 +407,34 @@ classdef IONS
             
         end
         
+        function self = ray_breakdown(self, properties, return_properties)
+            prop1 = properties(1,1);
+            samp_arr = return_properties.(prop1);
+            num_rays = length(self.elevs);
+            
+            breakdown = struct();
+            
+            rsto = 24;
+            per_hour_tot = zeros(rsto,1);
+            for nhops = 1:1:self.nhops_max
+                per_hour = zeros(rsto,1);
+                hop_field = "hop_" + nhops;
+                
+                for hour = 1:1:rsto
+                    hour_slice = samp_arr.(hop_field)(hour, :);
+                    percent = nnz(hour_slice) / num_rays;
+                    per_hour(hour) = percent;
+                end
+                
+                per_hour_tot = per_hour_tot + per_hour;
+                breakdown.(hop_field) = per_hour;
+                
+            end
+            self.per_tot = per_hour_tot;
+            self.per_hop = breakdown;
+            
+        end
+        
         % Getters
         function res = get_gen_params(self)
             res = struct('date', self.date, 'UT', self.UT, 'elevs', self.elevs, ...
@@ -420,6 +459,10 @@ classdef IONS
         
         function res = get_iono_series(self)
             res = self.iono_series;
+        end
+        
+        function res = get_ray_breakdown(self)
+            res = struct("per_tot", self.per_tot, "per_hop", self.per_hop);
         end
     end
 end
