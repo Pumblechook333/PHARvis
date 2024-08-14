@@ -89,7 +89,7 @@ classdef IONS
                 R12 = -1
                 mode = 1
                 gen = 0
-                brk = true
+                brk = false
             end
             %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             % General Parameters
@@ -250,7 +250,7 @@ classdef IONS
                     mkdir(dir)
                 end
                 
-                iono_grid_parms = self.iono_grid_parms;
+                iono_grid_parms = self.iono_grid_parms; %#ok<*PROPLC>
                 geomag_grid_parms = self.geomag_grid_parms;
                 UT = self.UT;
                 
@@ -369,7 +369,6 @@ classdef IONS
                     tmp = zeros(1,num_elevs);
                     ray_props = repmat(tmp, nprops, 1);
                     
-                    % Find maximum height of rays
                     for elev = 1:1:num_elevs
                         grounded_ray = ray_data_N(elev).ray_label == 1;
                         if grounded_ray
@@ -379,6 +378,9 @@ classdef IONS
                                     if props(p,2) == "ray"
                                         ray_props(p, elev) = ...
                                                 ray_N(elev).(props(p))(end);
+                                    elseif props(p,2) == "ray_max"
+                                        ray_props(p, elev) = ...
+                                                max(ray_N(elev).(props(p)));
                                     else
                                         ray_props(p, elev) = ...
                                                   sum(ray_data_N(elev).(props(p)));

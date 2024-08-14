@@ -39,8 +39,9 @@ for mode_key_i = 1:1:2
                        + el_start + ":" + el_inc + ":" + el_stop;
         r12_string = " || R12: " + R12;
         mode_string = " || " + mode_key + "-mode";
-
-        obj = IONS(date, elevs, freq, R12, mode, gen);
+        
+        brk = true;
+        obj = IONS(date, elevs, freq, R12, mode, gen, brk);
 
         %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         % Raytracing

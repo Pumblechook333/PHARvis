@@ -17,7 +17,7 @@ elevs = el_start : el_inc : el_stop;
 freq = 10;
 R12_sel = [-1, 25, 50, 100, 200];
 R12 = R12_sel(5);
-gen = 0; % 0 = no gen, 1 = gen
+gen = 1; % 0 = no gen, 1 = gen
 
 elevs_string = " || Initial Elevations: " ...
                + el_start + ":" + el_inc + ":" + el_stop;
@@ -27,5 +27,4 @@ obj = IONS(date, elevs, freq, R12, gen);
 
 props = ["phase_path", "geometric_distance"];
 obj.ray_props(props)
-
 
