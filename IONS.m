@@ -96,6 +96,13 @@ classdef IONS
             
             self.R12 = R12;
             self.mode = mode;
+            
+            if mode == 1
+                disp_mode = 'O';
+            else
+                disp_mode = 'X';
+            end 
+            fprintf(disp_mode + "-mode, " + R12 + " R12 \n");
 
             % Generate an Ionosphere for each hour
             self.date = date;           % yyyy m d 0 0

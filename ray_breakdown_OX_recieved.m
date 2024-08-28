@@ -12,7 +12,7 @@ date = [2021 7 1 0 0];
 
 el_start = 0;
 
-hi_res = 0;
+hi_res = 1;
 if hi_res
     el_inc = 0.2;
     el_stop = 50;
@@ -59,7 +59,7 @@ for r12_i = 1:1:r12_max
 
     %clf
     hr_range = 0:1:23;
-    tmp = zeros(1,5);
+    tmp = zeros(1,4);           % One slot for each hop
     bars_O = repmat(tmp,24,1);
     bars_X = repmat(tmp,24,1);
     nhops = obj_O.nhops_max;
@@ -69,33 +69,43 @@ for r12_i = 1:1:r12_max
     for hour = 1:1:24
         per_hr_O = tmp;
         per_hr_X = tmp;
-        
-        per_hr_O(1) = per_tot_O(hour);
-        per_hr_X(1) = per_tot_X(hour);
 
         for hop = 1:1:nhops
             hop_field = "hop_" + hop;
-            per_hr_O(hop+1) = per_hop_O.(hop_field)(hour);
-            per_hr_X(hop+1) = per_hop_X.(hop_field)(hour);
+            
+            if per_tot_O(hour) == 0
+                per_hr_O(hop) = 0;
+            else
+                per_hr_O(hop) = per_hop_O.(hop_field)(hour) / per_tot_O(hour);
+            end
+            
+            if per_tot_X(hour) == 0
+                per_hr_X(hop) = 0;
+            else
+                per_hr_X(hop) = per_hop_X.(hop_field)(hour) / per_tot_X(hour);
+            end
+            
         end
 
         bars_O(hour, :) = per_hr_O;
         bars_X(hour, :) = per_hr_X;
     end
-
+    
+    if hi_res
+        fprintf("Exporting data for R12: " + R12 + "\n\n")
+        writematrix(bars_O, "export_data/" + R12 + "_O_mode_percentages.csv")
+        writematrix(bars_X, "export_data/" + R12 + "_X_mode_percentages.csv")
+    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Plot Line Graph
     
     figure(count)
     hold on;
-    yrange_O = bars_O(:, 1).';
-    yrange_X = bars_X(:, 1).';
     
-    c = ["k", "r", "g", "b", "m"];
+    c = ["r", "g", "b", "m"];
     
-    plot(hr_range, yrange_O, '-k', "LineWidth", 4);
-    plot(hr_range, yrange_X, '--k', "LineWidth", 4);
-    for hop = 2:1:5
+    for hop = 1:1:4
         style = "-" + c(hop);
         yrange_O = bars_O(:, hop).';
         plot(hr_range, yrange_O, style, "LineWidth", 2);
@@ -106,14 +116,13 @@ for r12_i = 1:1:r12_max
     end
     hold off;
     
-    legend_cells = {'Total O', 'Total X', '1-hop O', '1-hop X',...
-                    '2-hop O', '2-hop X','3-hop O', '3-hop X',...
-                    '4-hop O', '4-hop X'};
+    legend_cells = {'1-hop O', '1-hop X','2-hop O', '2-hop X',...
+                    '3-hop O', '3-hop X','4-hop O', '4-hop X'};
     legend(legend_cells, 'Location', 'eastoutside');
     xlabel('Time (UT)');
-    ylabel('Percent of Rays Sent (%)');
+    ylabel('Percent of Rays Recieved (%)');
     xticks(hr_range);
-    ylim([0,0.25])
+    ylim([0,1])
     grid on;
     
     set(gca,"FontSize",20)
@@ -125,15 +134,15 @@ for r12_i = 1:1:r12_max
     % SAVE PLOTS if high res
     set(gcf, 'Position', get(0, 'Screensize') / 1.1);
     
-    dirname = "breakdown_plots_OX/";
+    dirname = "breakdown_plots_OX_recieved/";
     if not(isfolder(dirname))
                 mkdir(dirname)
     end
     
     if hi_res
         set(gcf,'visible','off')
-        figname = "figure_" + R12 + "_OX" + ".jpg";
         sppi = get(groot,"ScreenPixelsPerInch");
+        figname = "figure_" + R12 + "_OX_recieved" + ".jpg";
         exportgraphics(gcf, dirname+figname, 'Resolution', sppi)
     end
 
