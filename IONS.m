@@ -444,6 +444,47 @@ classdef IONS
             
         end
         
+        function res = ray_trace(self, hour)
+            arguments
+                self
+                
+                hour
+            end
+            hour_field = "i" + hour;
+
+            tol = [1e-7 0.01 25];       % ODE solver tolerance and min max stepsizes
+            num_elevs = length(self.elevs); 
+
+            range = 100;
+            wgs84 = wgs84Ellipsoid('km');
+            
+            rays_N = struct();
+            for nhops = 1:1:self.nhops_max
+                hop_field = "hop_" + nhops;
+                
+                iono_pf_grid = self.iono_series.(hour_field).iono_pf_grid;
+                iono_pf_grid_5 = self.iono_series.(hour_field).iono_pf_grid_5;
+                collision_freq = self.iono_series.(hour_field).collision_freq;
+                Bx = self.iono_series.(hour_field).Bx;
+                By = self.iono_series.(hour_field).By;
+                Bz = self.iono_series.(hour_field).Bz;
+
+                % convert plasma frequency grid to  electron density in electrons/cm^3
+                iono_en_grid = iono_pf_grid.^2 / 80.6164e-6;
+                iono_en_grid_5 = iono_pf_grid_5.^2 / 80.6164e-6;
+
+                [~, ray_N, ~] = ...
+                  raytrace_3d(self.origin_lat, self.origin_lon, self.origin_ht, self.elevs, self.ray_bears, self.freqs, ...
+                              self.mode, nhops, tol, iono_en_grid, iono_en_grid_5, ...
+                              collision_freq, self.iono_grid_parms, Bx, By, Bz, ...
+                              self.geomag_grid_parms);  
+               
+                rays_N.(hop_field) = ray_N;
+            end
+            
+            res = rays_N;
+        end
+        
         % Getters
         function res = get_gen_params(self)
             res = struct('date', self.date, 'UT', self.UT, 'elevs', self.elevs, ...
@@ -472,6 +513,10 @@ classdef IONS
         
         function res = get_ray_breakdown(self)
             res = struct("per_tot", self.per_tot, "per_hop", self.per_hop);
+        end
+        
+        function res = get_hour_rays(self, hour)
+            res = ray_trace(self, hour);
         end
     end
 end
