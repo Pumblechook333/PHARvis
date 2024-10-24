@@ -6,7 +6,10 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
 clf
 %% Constants / Settings
 mode_keys = ["O", "X"];
-R12_sel = [-1, 25, 50, 100, 200];
+% r12_sel = [-1, 25, 50, 100, 200];
+r12_sel = [57];
+r12_sz = size(r12_sel);
+r12_sz = r12_sz(2);
 
 date = [2021 7 1 0 0];
 
@@ -30,11 +33,11 @@ brk = true;
 
 %% Loop R12 densities
 count = 1;
-r12_max = 5;
+r12_max = r12_sz;
 for r12_i = 1:1:r12_max
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % GET necessary vars
-    R12 = R12_sel(r12_i);
+    R12 = r12_sel(r12_i);
 
     elevs_string = " || Initial Elevations: " ...
                    + el_start + ":" + el_inc + ":" + el_stop;

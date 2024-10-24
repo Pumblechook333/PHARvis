@@ -6,7 +6,7 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
 clf
 %% Constants / Settings
 mode_keys = ["O", "X"];
-R12_sel = [-1, 25, 50, 100, 200];
+R12_sel = [-1, 25, 50, 100, 200, 57];
 date = [2021 7 1 0 0];
 el_start = 0;
 
@@ -28,7 +28,7 @@ brk = false;
 
 %% GET necessary vars
 
-R12 = R12_sel(1);
+R12 = R12_sel(end);
 
 elevs_string = " || Initial Elevations: " ...
                + el_start + ":" + el_inc + ":" + el_stop;
