@@ -6,8 +6,8 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n")
 % GET necessary vars
 
 date = [2021 7 1 0 0];
-elevs = 0:0.2:90;
-% elevs = 0:2:90;
+% elevs = 0:0.2:90;
+elevs = 0:2:90;
 freq = 10;
 R12 = 57;
 mode = 1;
@@ -45,7 +45,6 @@ nhops = 2;
 
 tol = [1e-7 0.01 25];       % ODE solver tolerance and min max stepsizes
 num_elevs = length(elevs); 
-% Generate the rays for the case where the magnetic field is ignored
 OX_mode = 1;
 % Ellipsoid to base distance calcualtions on
 wgs84 = wgs84Ellipsoid('km');
