@@ -8,8 +8,8 @@ mode_keys = ["O", "X"];
 R12_sel = [-1, 25, 50, 57, 100, 200];
 
 count = 1;
-for mode_key_i = 1:1:2
-    for r12_i = 1:1:5
+for mode_key_i = 1:1:1
+    for r12_i = 1:1:1
         %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         % GET necessary vars
 
@@ -17,7 +17,7 @@ for mode_key_i = 1:1:2
 
         el_start = 0;
         
-        hi_res = 1;
+        hi_res = 0;
         if hi_res
             el_inc = 0.1;
             el_stop = 50;
@@ -63,14 +63,17 @@ for mode_key_i = 1:1:2
         %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         % Plotting
         fprintf("\nPlotting Figure " + count + "\n")
-        figure(count)
+        fig = figure(count);
+        tcl = tiledlayout(fig, 2,2);
+        h = gobjects(4,1);
 
         hr_range = 0:1:23;
         elevs_range = flip(elevs);
 
         nhop_max = 4;
         for nhops = 1:1:nhop_max
-            subplot(2,2,nhops)
+            %subplot(2,2,nhops)
+            ax = nexttile(tcl);
 
             hop_field = "hop_" + nhops;
             fprintf("Plotting " + nhops + "-hop rays \n")
@@ -80,31 +83,43 @@ for mode_key_i = 1:1:2
             ratio = ratio.';
             ratio = flip(ratio);
 
-            h = heatmap(hr_range, elevs_range, ratio, 'ColorLimits', [0.7 1.0], ...
-                        'Colormap', jet);
+            %h(nhops) = heatmap(hr_range, elevs_range, ratio, 'ColorLimits', [0.7 1.0], ...
+            %            'Colormap', jet);
+            
+            h(nhops) = heatmap(hr_range, elevs_range, ratio, 'ColorbarVisible', 'off');
 
-            warning('off', 'MATLAB:structOnObject')
-            hs = struct(h);
-            ylabel(hs.Colorbar, "Ground Range (km) / Geometric Path Length (km)");
+            %warning('off', 'MATLAB:structOnObject')
+            %hs = struct(h);
+            %ylabel(hs.Colorbar, "Ground Range (km) / Geometric Path Length (km)");
 
-            h.Title = "Number of Hops:" + nhops;
-            h.XLabel = 'Time (UT)';
-            h.YLabel = 'Elevation (°)';
-            h.GridVisible = 'off';
+            %h(nhops).Title = "Number of Hops:" + nhops;
+            %h(nhops).XLabel = 'Time (UT)';
+            %h(nhops).YLabel = 'Elevation (°)';
+            %h(nhops).GridVisible = 'off';
 
             % Convert each number in the array into a string
-            CustomYLabels = string(elevs_range);
+            %CustomYLabels = string(elevs_range);
             % Replace all but the 10th elements by spaces
-            CustomYLabels(mod(elevs_range,10) ~= 0) = " ";
+            %CustomYLabels(mod(elevs_range,10) ~= 0) = " ";
             % Set the 'XDisplayLabels' property of the heatmap 
             % object 'h' to the custom x-axis tick labels
-            h.YDisplayLabels = CustomYLabels;
+            %h.YDisplayLabels = CustomYLabels;
 
         end
+        
+        % Equate color limits in all heatmaps
+        globalColorLim = [0, 1];
+        set(h, 'ColorLimits', globalColorLim)
+        
+        % Create global colorbar that uses the global color limits
+        ax = axes(tcl,'visible','off','Colormap',h(1).Colormap,'CLim',globalColorLim);
+        cb = colorbar(ax);
+        %cb.Layout.Tile = 'East';
+        cb.Location = 'East';
 
         ti = "Ground Range / Geometric Path Length Per Elevation Per Hour";
         sgtitle(ti+elevs_string+r12_string+mode_string)
-        set(gcf, 'Position', get(0, 'Screensize') / 1.1);
+        %set(gcf, 'Position', get(0, 'Screensize') / 1.1);
         
         dirname = "path_length_heatmaps_end/";
         if not(isfolder(dirname))

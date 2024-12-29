@@ -6,10 +6,14 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n")
 % GET necessary vars
 
 date = [2021 7 1 0 0];
-% elevs = 0:0.2:90;
-elevs = 0:2:90;
+elevs = 0:0.2:90;
+% elevs = 0:2:90;
 freq = 10;
-obj = IONS(date, elevs, freq);
+R12 = 57;
+mode = 1;
+gen = 0;
+brk = 0;
+obj = IONS(date, elevs, freq, R12, mode, gen, brk);
 
 iono_series = obj.get_iono_series();
 
@@ -37,12 +41,12 @@ ray_bears = obj.get_bearing();
 
 rsta = 1;
 rsto = 24;
-nhops = 1;
+nhops = 2;
 
 tol = [1e-7 0.01 25];       % ODE solver tolerance and min max stepsizes
 num_elevs = length(elevs); 
 % Generate the rays for the case where the magnetic field is ignored
-OX_mode = 0;
+OX_mode = 1;
 % Ellipsoid to base distance calcualtions on
 wgs84 = wgs84Ellipsoid('km');
 % Range for endpoint of ray (km)
@@ -90,6 +94,12 @@ while i <= rsto
 %         in_range = 1;
         if in_range == 1
             plot3(ray_N(ii).lat,  ray_N(ii).lon, ray_N(ii).height, 'g')
+            
+            for hop = 1:nhops
+                lat = ray_data_N(ii).lat(hop);
+                lon = ray_data_N(ii).lon(hop);
+                plot3(lat, lon, 0, 'x', 'color', 'r', 'markersize', 20, 'LineWidth',4)
+            end
         elseif in_range == 0
             fprintf("Elev " + elevs(ii) + " not in range. \n")
         elseif in_range == -1

@@ -19,7 +19,7 @@ classdef IONS
         UT
         elevs
         freqs           % Frequency (MHz)
-        R12             % Get daily total sunspot number https://www.sidc.be/SILSO/datafiles (SN_d_tot_V2.0.csv)
+        R12
         mode
         nhops_max = 4;
         
@@ -106,11 +106,11 @@ classdef IONS
 
             % Generate an Ionosphere for each hour
             self.date = date;           % yyyy m d 0 0
-            UT = repmat(self.date, [25,1]);
-            for i=1:1:25
+            UT = repmat(self.date, [24,1]);
+            for i=1:1:24
                 UT(i,4) = i-1;
             end
-            self.UT = UT;
+            self.UT = UT;           % ADJUST TO 0,25 for full plot
 
             self.elevs = elevs;
             self.freqs = ones(size(self.elevs))*freq;   % frequency (MHz)
@@ -237,7 +237,7 @@ classdef IONS
                 gen = 0;
                 rsta = 1;
                 rinc = 1;
-                rsto = 25;
+                rsto = 24;
             end
             
             %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -334,7 +334,7 @@ classdef IONS
             
             rsta = 1;
             rinc = 1;
-            rsto = 25;
+            rsto = 24;
 
             tol = [1e-7 0.01 25];       % ODE solver tolerance and min max stepsizes
             num_elevs = length(self.elevs); 
@@ -426,7 +426,7 @@ classdef IONS
             
             breakdown = struct();
             
-            rsto = 25;
+            rsto = 24;
             per_hour_tot = zeros(rsto,1);
             for nhops = 1:1:self.nhops_max
                 per_hour = zeros(rsto,1);

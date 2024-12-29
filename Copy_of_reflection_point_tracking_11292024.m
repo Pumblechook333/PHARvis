@@ -82,14 +82,16 @@ for mode_key_i = 1:1:2
         plot(0,0, 'color', 'k', 'marker', 'x', 'markersize', 1)
         legend('1-hop', '2-hop', '3-hop', '4-hop', 'AutoUpdate', 'off')
 
-        for nhops = 1:1:obj.nhops_max       % Per Hop
+        for nhops = 1:1:obj.nhops_max
             hop_field = "hop_" + nhops;
             fprintf("Plotting " + nhops + "-hop rays \n")
-            
-            for k = 1:1:25                  % Per Hour
+
+            hr_range = 0:1:24;
+
+            for k = 1:1:24
                 hour_field = 'i' + string(k);
 
-                for i = 1:1:num_elevs       % Per Elevation
+                for i = 1:1:num_elevs
                     y = max_heights.(hop_field)(k,i);
                     in_range = (0 < y) & (y < iono_height);
                     
@@ -104,13 +106,7 @@ for mode_key_i = 1:1:2
                 end
 
             end
-            
-            if hi_res
-                fprintf("Exporting data for R12: " + R12 + " / " + mode_key + "-mode / " + nhops + "-hop \n\n")
-                writematrix(max_heights.(hop_field), "export_data/max_heights_" + R12 + "_" + mode_key + "mode_" + nhops + "nhops.csv")
-                writematrix(initial_elevs.(hop_field), "export_data/initial_elevs_" + R12 + "_" + mode_key + "mode_" + nhops + "nhops.csv")
-            end
-            
+
         end
 
         hold off

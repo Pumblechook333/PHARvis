@@ -17,7 +17,7 @@ for mode_key_i = 1:1:2
 
         el_start = 0; 
         
-        hi_res = 1;
+        hi_res = 0;
         if hi_res
             el_inc = 0.1;
             el_stop = 50;
@@ -50,6 +50,11 @@ for mode_key_i = 1:1:2
         %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         % Raytracing
 
+        %.phase_path              - phase path (km) \
+        %                         ** NUMBER OF PHASES THE SIGNAL GONE THROUGH
+        %                           (1 cycle, 2 cycles, 2.75 cycles)
+        %.geometric_distance      - geometrical distance travelled by ray (km)
+        
         props = [["phase_path", "ray"];
                  ["geometric_distance", "ray"]];
         rps = obj.ray_props(props);

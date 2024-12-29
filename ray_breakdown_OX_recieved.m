@@ -10,12 +10,11 @@ mode_keys = ["O", "X"];
 r12_sel = [57];
 r12_sz = size(r12_sel);
 r12_sz = r12_sz(2);
-
 date = [2021 7 1 0 0];
 
 el_start = 0;
 
-hi_res = 1;
+hi_res = 0;
 if hi_res
     el_inc = 0.2;
     el_stop = 50;
@@ -42,7 +41,7 @@ for r12_i = 1:1:r12_max
     elevs_string = " || Initial Elevations: " ...
                    + el_start + ":" + el_inc + ":" + el_stop;
     r12_string = " || R12: " + R12;
-
+    
     obj_O = IONS(date, elevs, freq, R12, 1, gen, brk);
     obj_X = IONS(date, elevs, freq, R12, -1, gen, brk);
 
@@ -61,15 +60,15 @@ for r12_i = 1:1:r12_max
     % Plotting
 
     %clf
-    hr_range = 0:1:23;
+    hr_range = 0:1:24;
     tmp = zeros(1,4);           % One slot for each hop
-    bars_O = repmat(tmp,24,1);
-    bars_X = repmat(tmp,24,1);
+    bars_O = repmat(tmp,25,1);
+    bars_X = repmat(tmp,25,1);
     nhops = obj_O.nhops_max;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Aggregate Data
-    for hour = 1:1:24
+    for hour = 1:1:25
         per_hr_O = tmp;
         per_hr_X = tmp;
 
