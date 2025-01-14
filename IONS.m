@@ -77,6 +77,31 @@ classdef IONS
             
         end
         
+        function in_range = chk_dist_2d(range, ray_N, RX_range)
+                        
+            if ~exist('RX_range', 'var')
+                RX_range = 2600;
+            end
+            
+            hrange = range;
+            
+            if ray_N.height(end) < hrange
+                ray_range = ray_N.ground_range(end);
+
+                d = abs(RX_range - ray_range);
+
+                % Check if endpoint of ray is within ground range
+                if d < range
+                    in_range = 1;
+                else
+                    in_range = 0;
+                end
+
+            else
+                in_range = -1;
+            end
+            
+        end
     end
     
     methods
@@ -246,7 +271,7 @@ classdef IONS
             append = "_" + self.iono_height + "km_series_" + self.R12;
             name = 'ionosphere' + append;
 
-            dir = name + '/';
+            dir = 'IONO/' + name + '/';
             fname = name + '.mat';
 
             PARMSPATH = dir + 'params_' + fname;
