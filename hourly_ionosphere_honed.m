@@ -137,7 +137,6 @@ while i <= rsto
     plot3(grid_corner(1), grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
     plot3(grid_corner(1)+4, grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
 
-
     RX = round([RX_coord(1), RX_coord(2)+360, 0], 2);
     x = RX_coord(1); y = RX_coord(2); z = 0;
     txt = "[" + x + ", " + y + ", " + z + "]";
@@ -163,6 +162,12 @@ while i <= rsto
     ax = gca;
     ax.FontSize = fs/1.5; 
     
+    [i, rot] = update_fig(i, rot);
+    
+end
+
+function [i, rot] = update_fig(i, rot)
+
     fig = gcf;
     was_a_key = waitforbuttonpress;
     if was_a_key && strcmp(get(fig, 'CurrentKey'), 'downarrow')
@@ -181,5 +186,7 @@ while i <= rsto
         
     end
     fprintf("\n")
+    
+    set(gcf, 'Position',  [100, 100, 900, 400])
     
 end

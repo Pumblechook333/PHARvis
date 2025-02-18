@@ -3,5 +3,9 @@
 *.asv
 *.\idea
 *.jpg
+*.png
 *.csv
+
 /PLOTS
+/IONO
+/EXPORT

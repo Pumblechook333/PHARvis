@@ -9,7 +9,8 @@ date = [2021 7 1 0 0];
 % elevs = 0:0.2:90;
 elevs = 0:2:90;
 freq = 10;
-obj = IONS(date, elevs, freq);
+
+obj = IONS(date, elevs, freq, 57, 0, 0, 0);
 
 iono_series = obj.get_iono_series();
 

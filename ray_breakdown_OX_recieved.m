@@ -14,13 +14,13 @@ date = [2021 7 1 0 0];
 
 el_start = 0;
 
-hi_res = 0;
+hi_res = 1;
 if hi_res
     el_inc = 0.2;
     el_stop = 50;
 else
     el_inc = 5;
-    el_stop = 90;
+    el_stop = 50;
 end
 
 elevs = el_start : el_inc : el_stop;
@@ -69,6 +69,7 @@ for r12_i = 1:1:r12_max
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Aggregate Data
     for hour = 1:1:25
+        fprintf("Aggregating Data for hour: " + hour + "\n")
         per_hr_O = tmp;
         per_hr_X = tmp;
 
@@ -95,8 +96,8 @@ for r12_i = 1:1:r12_max
     
     if hi_res
         fprintf("Exporting data for R12: " + R12 + "\n\n")
-        writematrix(bars_O, "export_data/" + R12 + "_O_mode_percentages.csv")
-        writematrix(bars_X, "export_data/" + R12 + "_X_mode_percentages.csv")
+        writematrix(bars_O, "EXPORT/export_data/" + R12 + "_O_mode_percentages.csv")
+        writematrix(bars_X, "EXPORT/export_data/" + R12 + "_X_mode_percentages.csv")
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,6 +125,7 @@ for r12_i = 1:1:r12_max
     xlabel('Time (UT)');
     ylabel('Percent of Rays Recieved (%)');
     xticks(hr_range);
+    xlim([0,24]);
     ylim([0,1])
     grid on;
     
@@ -136,9 +138,9 @@ for r12_i = 1:1:r12_max
     % SAVE PLOTS if high res
     set(gcf, 'Position', get(0, 'Screensize') / 1.1);
     
-    dirname = "breakdown_plots_OX_recieved/";
+    dirname = "PLOTS/breakdown_plots_OX_recieved/";
     if not(isfolder(dirname))
-                mkdir(dirname)
+        mkdir(dirname)
     end
     
     if hi_res

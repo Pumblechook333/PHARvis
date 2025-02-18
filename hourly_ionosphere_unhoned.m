@@ -1,3 +1,7 @@
+% This is the script which produced the 3D figure that is
+% currently visible in the paper, as of 1/14/25 at
+% 2:18PM
+
 clear
 clc
 fprintf("~~~~~ " + mfilename + " ~~~~~ \n")
@@ -199,6 +203,12 @@ while i <= rsto
     ax = gca;
     ax.FontSize = fs/1.5; 
     
+    [i, rot] = update_fig(i, rot);
+    
+end
+
+function [i, rot] = update_fig(i, rot)
+
     fig = gcf;
     was_a_key = waitforbuttonpress;
     if was_a_key && strcmp(get(fig, 'CurrentKey'), 'downarrow')
@@ -217,5 +227,7 @@ while i <= rsto
         
     end
     fprintf("\n")
+    
+    set(gcf, 'Position',  [100, 100, 900, 400])
     
 end

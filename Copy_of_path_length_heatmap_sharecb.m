@@ -9,7 +9,7 @@ mode_keys = ["O", "X"];
 R12_sel = [57];
 
 count = 1;
-for mode_key_i = 1:1:2
+for mode_key_i = 1:1:1
     for r12_i = 1:1:1
         %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         % GET necessary vars
@@ -18,7 +18,7 @@ for mode_key_i = 1:1:2
 
         el_start = 0;
         
-        hi_res = 1;
+        hi_res = 0;
         if hi_res
             el_inc = 0.1;
             el_stop = 50;
@@ -66,9 +66,6 @@ for mode_key_i = 1:1:2
         fprintf("\nPlotting Figure " + count + "\n")
         fig = figure(count);
         tcl = tiledlayout(fig, 2,2);
-        tcl.Padding = 'compact';
-        tcl.TileSpacing = 'compact';
-        ax = gobjects(4,1); % Store axes handles
         h = gobjects(4,1);
 
         hr_range = 0:1:24;
@@ -76,79 +73,62 @@ for mode_key_i = 1:1:2
 
         nhop_max = 4;
         for nhops = 1:1:nhop_max
-            ax(nhops) = nexttile(tcl); % Get axes handle and store it
+            %subplot(2,2,nhops)
+            ax = nexttile(tcl);
 
             hop_field = "hop_" + nhops;
             fprintf("Plotting " + nhops + "-hop rays \n")
-
+            
             gr = cell2mat(ground_range.(hop_field));
             pl = cell2mat(geometric_path_length.(hop_field));
-
+            
             ratio = gr ./ pl;
             ratio(isnan(ratio)) = 0;
             ratio = ratio.';
             ratio = flip(ratio);
 
-            h(nhops) = imagesc(hr_range, elevs_range, ratio);
-            axis xy;
-            colormap(ax(nhops), jet); % Set colormap for each axes
-
-            title(ax(nhops), "Number of Hops:" + nhops); % Set title for the axes
-            xlabel(ax(nhops), 'Time (UT)');
-            ylabel(ax(nhops), 'Elevation (°)');
-
-            % Custom Y-axis labels (improved)
-            CustomYLabels = string(elevs_range);
-            CustomYLabels(mod(elevs_range,10) ~= 0) = " ";
-            ax(nhops).YTick = flip(elevs_range(mod(elevs_range,10) == 0));
-            ax(nhops).YTickLabel = flip(CustomYLabels(mod(elevs_range,10) == 0));
+            %h(nhops) = heatmap(hr_range, elevs_range, ratio, 'ColorLimits', [0.7 1.0], ...
+            %            'Colormap', jet);
             
-             % Custom X-axis labels (improved)
-            CustomXLabels = string(hr_range);
-            CustomXLabels(mod(hr_range,2) ~= 0) = " ";
-            ax(nhops).XTick = hr_range(mod(hr_range,2) == 0);
-            ax(nhops).XTickLabel = CustomXLabels(mod(hr_range,2) == 0);
-            
-            ax(nhops).FontSize = 14;
+            h(nhops) = heatmap(hr_range, elevs_range, ratio, 'ColorbarVisible', 'off');
+
+            %warning('off', 'MATLAB:structOnObject')
+            %hs = struct(h);
+            %ylabel(hs.Colorbar, "Ground Range (km) / Geometric Path Length (km)");
+
+            %h(nhops).Title = "Number of Hops:" + nhops;
+            %h(nhops).XLabel = 'Time (UT)';
+            %h(nhops).YLabel = 'Elevation (°)';
+            %h(nhops).GridVisible = 'off';
+
+            % Convert each number in the array into a string
+            %CustomYLabels = string(elevs_range);
+            % Replace all but the 10th elements by spaces
+            %CustomYLabels(mod(elevs_range,10) ~= 0) = " ";
+            % Set the 'XDisplayLabels' property of the heatmap 
+            % object 'h' to the custom x-axis tick labels
+            %h.YDisplayLabels = CustomYLabels;
 
         end
         
-        % Equate color limits in all heatmaps (Corrected)
-%         data = cell(1, nhop_max);
-%         for nhops = 1:nhop_max
-%             data{nhops} = get(h(nhops), 'CData');
-%         end
-% 
-%         globalColorLim = [min(cellfun(@(x) min(x(:)), data)), max(cellfun(@(x) max(x(:)), data))];
-        globalColorLim = [0.7, 1.0];
+        % Equate color limits in all heatmaps
+        globalColorLim = [0, 1];
+        set(h, 'ColorLimits', globalColorLim)
         
-        for nhops = 1:nhop_max  % Loop through axes handles
-            set(ax(nhops), 'CLim', globalColorLim); % Set CLim for each axes
-        end
+        % Create global colorbar that uses the global color limits
+        ax = axes(tcl,'visible','off','Colormap',h(1).Colormap,'CLim',globalColorLim);
+        cb = colorbar(ax);
+        %cb.Layout.Tile = 'East';
+        cb.Location = 'East';
 
-        % Create global colorbar to the right of the tiled layout
-        cb_ax = axes(fig, 'Position', [0.96 0.1 0.03 0.8]);
-        set(cb_ax, 'XTickLabel', {}, 'YTickLabel', {})
-        set(cb_ax,'color','none')
-        cb_ax.XAxis.Visible = 'off';
-        cb_ax.YAxis.Visible = 'off';
-        
-        colormap(cb_ax, jet);
-        caxis(globalColorLim);
-        cb = colorbar(cb_ax);
-        set(cb, 'Position', [0.96 0.1 0.02 0.8])
-        set(cb, 'YAxisLocation','right', 'FontSize', 10)
-
-        % Improve Title
         ti = "Ground Range / Geometric Path Length Per Elevation Per Hour";
-        sgtitle(tcl, ti+elevs_string+r12_string+mode_string, 'Fontsize', 18)
-
+        sgtitle(ti+elevs_string+r12_string+mode_string)
+        %set(gcf, 'Position', get(0, 'Screensize') / 1.1);
+        
         dirname = "path_length_heatmaps_end/";
         if not(isfolder(dirname))
                     mkdir(dirname)
         end
-        
-        set(gcf, 'Position',  [100, 100, 1400, 700])
         
         if hi_res
             set(gcf,'visible','off')

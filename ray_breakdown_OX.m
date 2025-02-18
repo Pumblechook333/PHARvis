@@ -7,18 +7,20 @@ clf
 %% Constants / Settings
 mode_keys = ["O", "X"];
 R12_sel = [-1, 25, 50, 100, 200];
+R12_sel = [57];
 
 date = [2021 7 1 0 0];
 
 el_start = 0;
 
-hi_res = 0;
+hi_res = 1;
 if hi_res
     el_inc = 0.2;
+%     el_inc = 1;
     el_stop = 50;
 else
     el_inc = 5;
-    el_stop = 90;
+    el_stop = 50;
 end
 
 elevs = el_start : el_inc : el_stop;
@@ -30,7 +32,7 @@ brk = true;
 
 %% Loop R12 densities
 count = 1;
-r12_max = 5;
+r12_max = 1;
 for r12_i = 1:1:r12_max
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % GET necessary vars
@@ -58,7 +60,7 @@ for r12_i = 1:1:r12_max
     % Plotting
 
     %clf
-    hr_range = 0:1:23;
+    hr_range = 0:1:24;
     tmp = zeros(1,5);
     bars_O = repmat(tmp,24,1);
     bars_X = repmat(tmp,24,1);
@@ -66,7 +68,7 @@ for r12_i = 1:1:r12_max
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Aggregate Data
-    for hour = 1:1:24
+    for hour = 1:1:25
         per_hr_O = tmp;
         per_hr_X = tmp;
         
@@ -113,6 +115,7 @@ for r12_i = 1:1:r12_max
     xlabel('Time (UT)');
     ylabel('Percent of Rays Sent (%)');
     xticks(hr_range);
+    xlim([0,24])
     ylim([0,0.25])
     grid on;
     
@@ -125,12 +128,12 @@ for r12_i = 1:1:r12_max
     % SAVE PLOTS if high res
     set(gcf, 'Position', get(0, 'Screensize') / 1.1);
     
-    dirname = "breakdown_plots_OX/";
-    if not(isfolder(dirname))
-                mkdir(dirname)
-    end
-    
     if hi_res
+        dirname = "PLOTS/breakdown_plots_OX/";
+        if not(isfolder(dirname))
+                    mkdir(dirname)
+        end
+        
         set(gcf,'visible','off')
         figname = "figure_" + R12 + "_OX" + ".jpg";
         sppi = get(groot,"ScreenPixelsPerInch");

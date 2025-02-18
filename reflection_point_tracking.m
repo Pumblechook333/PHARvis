@@ -5,7 +5,6 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
 clf
 
 mode_keys = ["O", "X"];
-% R12_sel = [-1, 25, 50, 100, 200, 57];
 r12_sel = [57];
 r12_sz = size(r12_sel);
 r12_sz = r12_sz(2);
@@ -21,7 +20,7 @@ for mode_key_i = 1:1:2
 
         el_start = 0;
         
-        hi_res = 1;
+        hi_res = 0;
         if hi_res
             el_inc = 0.1;
             el_stop = 50;

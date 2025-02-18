@@ -1,6 +1,5 @@
 classdef IONS
     properties(Constant)
-        % 25, 50, 100, 200
         % R12 = -1;            % Autoselect sunspot number
         doppler_flag = 0;    % Not interested in Doppler shift
         TX_coord = [40.67583063, -105.038933178];   % WWV Station
@@ -102,6 +101,52 @@ classdef IONS
             end
             
         end
+        
+        function ray_bear = bearing(origin_lat, origin_lon, receiver_lat, ...
+                                    receiver_lon, origin_height, ...
+                                    target_height, aim, wgs) 
+            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            % Determine Bearing
+            
+            arguments
+                origin_lat                  % latitude of TX (°)
+                origin_lon                  % longitude of TX (°)
+                receiver_lat                % latitude of RX (°)
+                receiver_lon                % longitude of RX (°)
+                origin_height = 0           % TX height above sea (km)
+                target_height = 250e3       % RX height above sea (km)
+                aim = 0                     % Adjusted bearing (°)
+                wgs = wgs84Ellipsoid        % Spherical earth geometry
+            end
+
+            % find the midpoint geographic location between the transmitter and
+            % receiver along great circle path
+            lat1=origin_lat;
+            lon1=origin_lon;
+            lat2=receiver_lat;
+            lon2=receiver_lon;
+            lat1_rad = deg2rad(lat1);
+            lon1_rad = deg2rad(lon1);
+            lat2_rad = deg2rad(lat2);
+            lon2_rad = deg2rad(lon2);
+
+            % find midpoint latitude
+            X = cos(lat2_rad) * cos(lon2_rad - lon1_rad);
+            Y = cos(lat2_rad) * sin(lon2_rad - lon1_rad);
+            mid_lat_rad = atan2(sin(lat1_rad) + sin(lat2_rad), sqrt((cos(lat1_rad) + X) ^ 2 + Y ^ 2));
+            % find midpoint longitude
+            mid_lon_rad = lon1_rad + atan2(Y, cos(lat1_rad) + X);
+            % convert rad into degree
+            mid_lat = rad2deg(mid_lat_rad);
+            mid_lon = rad2deg(mid_lon_rad);
+
+            [az,~,~] = geodetic2aer(mid_lat,mid_lon,target_height,origin_lat,...
+                                    origin_lon,origin_height,wgs);
+            ray_bear = az + aim;          
+            fprintf("Bearing of: " + az + "° \n");
+                        
+        end
+
     end
     
     methods
@@ -141,7 +186,10 @@ classdef IONS
             self.freqs = ones(size(self.elevs))*freq;   % frequency (MHz)
             
             self = self.coords();
-            self = self.bearing();
+            ray_bear = self.bearing(self.origin_lat, self.origin_lon, ...
+                                 self.receiver_lat, self.receiver_lon);
+            self.ray_bears = ones(size(self.elevs))*ray_bear;
+            
             self = self.iono_parms();
             self = self.gl_iono(gen);
             
@@ -164,43 +212,7 @@ classdef IONS
             self.receiver_lon = self.RX_coord(2);
 
         end
-        
-        function self = bearing(self) 
-            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            % Determine Bearing
-
-            % find the midpoint geographic location between the transmitter and
-            % receiver along great circle path
-            lat1=self.origin_lat;
-            lon1=self.origin_lon;
-            lat2=self.receiver_lat;
-            lon2=self.receiver_lon;
-            lat1_rad = deg2rad(lat1);
-            lon1_rad = deg2rad(lon1);
-            lat2_rad = deg2rad(lat2);
-            lon2_rad = deg2rad(lon2);
-
-            % find midpoint latitude
-            X = cos(lat2_rad) * cos(lon2_rad - lon1_rad);
-            Y = cos(lat2_rad) * sin(lon2_rad - lon1_rad);
-            mid_lat_rad = atan2(sin(lat1_rad) + sin(lat2_rad), sqrt((cos(lat1_rad) + X) ^ 2 + Y ^ 2));
-            % find midpoint longitude
-            mid_lon_rad = lon1_rad + atan2(Y, cos(lat1_rad) + X);
-            % convert rad into degree
-            mid_lat = rad2deg(mid_lat_rad);
-            mid_lon = rad2deg(mid_lon_rad);
-
-            wgs84 = wgs84Ellipsoid;
-
-            H = 250e3; % (F-layer)
-            [az,~,~] = geodetic2aer(mid_lat,mid_lon,H,self.origin_lat,self.origin_lon,self.origin_ht,wgs84);
-            aim = 0;
-            az = az + aim;
-            self.ray_bears = ones(size(self.elevs))*az ; % initial bearing of rays            
-            fprintf("Bearing of: " + az + "° \n");
-            
-        end
-        
+                
         function self = iono_parms(self, ht_p, lat_p, lon_p)
             arguments
                 self
@@ -377,6 +389,7 @@ classdef IONS
                 
                 tmp = zeros(rsto,num_elevs);
                 arrs = repmat(tmp, nprops, 1);
+                arrs = num2cell(arrs);
                 
                 for i = rsta:rinc:rsto
                     hour_field = 'i' + string(i);
@@ -400,6 +413,7 @@ classdef IONS
                     
                     tmp = zeros(1,num_elevs);
                     ray_props = repmat(tmp, nprops, 1);
+                    ray_props = num2cell(ray_props);
                     
                     for elev = 1:1:num_elevs
                         grounded_ray = ray_data_N(elev).ray_label == 1;
@@ -408,17 +422,21 @@ classdef IONS
                             if in_range
                                 for p = 1:nprops
                                     if props(p,2) == "ray"
-                                        ray_props(p, elev) = ...
+                                        ray_props{p, elev} = ...
                                                 ray_N(elev).(props(p))(end);
                                     elseif props(p,2) == "ray_max"
-                                        ray_props(p, elev) = ...
+                                        ray_props{p, elev} = ...
                                                 max(ray_N(elev).(props(p)));
+                                    elseif props(p,2) == "ray_all"
+                                        ray_props{p, elev} = ray_N(elev).(props(p));
                                     elseif props(p,2) == "ray_data"
-                                        ray_props(p, elev) = ...
+                                        ray_props{p, elev} = ...
                                                   ray_data_N(elev).(props(p))(end);
                                     elseif props(p,2) == "ray_data_sum"
-                                        ray_props(p, elev) = ...
+                                        ray_props{p, elev} = ...
                                                   sum(ray_data_N(elev).(props(p)));
+                                    elseif props(p,2) == "ray_data_all"
+                                        ray_props{p, elev} = ray_data_N(elev).(props(p));
                                     end
                                 end
                             end
