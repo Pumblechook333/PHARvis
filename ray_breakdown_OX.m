@@ -13,7 +13,7 @@ date = [2021 7 1 0 0];
 
 el_start = 0;
 
-hi_res = 1;
+hi_res = 0;
 if hi_res
     el_inc = 0.2;
 %     el_inc = 1;

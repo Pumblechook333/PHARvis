@@ -109,19 +109,19 @@ while i <= rsto
     view(rot,45)
         
     TX = round([TX_coord(1), TX_coord(2), 0], 2); 
-    % BP = [mid_lat, mid_lon+360, 200];
+    RX = round([RX_coord(1), RX_coord(2), 0], 2); 
     BP = round([42.12, -82.60, 200], 2);
-    RX = round([40.79, -69.50, 0], 2);
+    % RX = round([40.79, -69.50, 0], 2);
 
     points = [TX; BP; RX];
     fs = 30;
 
-%     for i = 1:1:3
-%         x = points(i,1); y = points(i,2); z = points(i,3);
-%         txt = "[" + x + ", " + y + ", " + z + "]";
-%         plot3(x, y, z, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-%         text(x - 0.5, y, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
-%     end
+    for i = 1:1:3
+        x = points(i,1); y = points(i,2); z = points(i,3);
+        txt = "[" + x + ", " + y + ", " + z + "]";
+        plot3(x, y, z, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
+        text(x - 0.5, y, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
+    end
     
 %   Bounds for ionosphere_500km_series
 %     grid_corner = [40, -(105+(48/60))];
@@ -131,17 +131,17 @@ while i <= rsto
 %     plot3(grid_corner(1)+3.5, grid_corner(2)+33, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
 
 % %   Bounds for ionosphere_500km_series_plus
-    grid_corner = [39, -106];
-    plot3(grid_corner(1), grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-    plot3(grid_corner(1)+4, grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-    plot3(grid_corner(1), grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-    plot3(grid_corner(1)+4, grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
+    % grid_corner = [39, -106];
+    % plot3(grid_corner(1), grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
+    % plot3(grid_corner(1)+4, grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
+    % plot3(grid_corner(1), grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
+    % plot3(grid_corner(1)+4, grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
 
-    RX = round([RX_coord(1), RX_coord(2)+360, 0], 2);
-    x = RX_coord(1); y = RX_coord(2); z = 0;
-    txt = "[" + x + ", " + y + ", " + z + "]";
-    plot3(x, y, z, 'o', 'color', 'y', 'markersize', 20, 'LineWidth',4)
-    text(x - 1, y - 4, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
+    % RX = round([RX_coord(1), RX_coord(2)+360, 0], 2);
+    % x = RX_coord(1); y = RX_coord(2); z = 0;
+    % txt = "[" + x + ", " + y + ", " + z + "]";
+    % plot3(x, y, z, 'o', 'color', 'y', 'markersize', 20, 'LineWidth',4)
+    % text(x - 1, y - 4, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
 
     set(gca, 'XDir','reverse')
     hold off

@@ -477,6 +477,7 @@ classdef IONS
                 
                 for hour = 1:1:rsto
                     hour_slice = samp_arr.(hop_field)(hour, :);
+                    hour_slice = cell2mat(hour_slice);
                     percent = nnz(hour_slice) / num_rays;
                     per_hour(hour) = percent;
                 end

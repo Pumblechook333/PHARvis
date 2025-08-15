@@ -37,7 +37,11 @@ iono_height = iono.iono_height;
 g = obj.get_gen_params();
 elevs = g.elevs;
 freqs = g.freqs;
-UT = g.UT;
+UT = repmat(date, [25,1]);
+for i=1:1:25
+    UT(i,4) = i-1;
+end
+
 
 c = obj.get_coords();
 origin_lat = c.origin_lat;
@@ -89,11 +93,11 @@ while i <= rsto
     
     plot3(TX_coord(1), TX_coord(2), 0, 'r', 'DisplayName', 'X-mode')
     hold on
-    plot3(TX_coord(1), TX_coord(2), 0, 'g', 'DisplayName', 'No B')
+    % plot3(TX_coord(1), TX_coord(2), 0, 'g', 'DisplayName', 'No B')
     plot3(TX_coord(1), TX_coord(2), 0, 'b', 'DisplayName', 'O-mode')
     legend('Location', 'best');
     
-    for oxmode = -1:1:1
+    for oxmode = -1:2:1
         plotcol = modecol(oxmode + 2);
         
         [ray_data_N, ray_N, ray_sv_N] = ...
@@ -140,51 +144,33 @@ while i <= rsto
     end
     
     view(rot,45)
-        
-%     TX = round([TX_coord(1), TX_coord(2), 0], 2); 
-%     BP = round([42.12, -82.60, 200], 2);
-%     RX = round([40.79, -69.50, 0], 2);
-    
+
     % From Python:
     TX = [40.68, -105.04, 0];
     BP = [41.75, -89.62, 200];
     RX = [40.74, -74.18, 0];
 
-    points = [TX; BP; RX];
+    points = [TX; RX];
     fs = 30;
     
-    for pt = 1:1:3
+    for pt = 1:1:2
         x = points(pt,1); y = points(pt,2); z = points(pt,3);
         txt = "[" + x + ", " + y + ", " + z + "]";
         plot3(x, y, z, 'o', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
-        text(x - 0.5, y, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
+        text(x + 0.25, y, z + 10, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
     end
+
+    x = BP(1); y = BP(2); z = BP(3);
+    txt = "Great Circle Path Midpoint";
+    plot3(x, y, z, 'o', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
+    text(x + 0.25, y, z + 10, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
     
-%   Bounds for ionosphere_500km_series
-%     grid_corner = [40, -(105+(48/60))];
-%     plot3(grid_corner(1), grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-%     plot3(grid_corner(1)+3.5, grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-%     plot3(grid_corner(1), grid_corner(2)+33, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-%     plot3(grid_corner(1)+3.5, grid_corner(2)+33, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4)
-
-% %   Bounds for ionosphere_500km_series_plus
-    grid_corner = [39, -106];
-    plot3(grid_corner(1), grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
-    plot3(grid_corner(1)+4, grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
-    plot3(grid_corner(1), grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
-    plot3(grid_corner(1)+4, grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
-
-%     RX = round([RX_coord(1), RX_coord(2), 0], 2);
-%     x = RX(1); y = RX(2); z = 0;
-%     txt = "[" + x + ", " + y + ", " + z + "]";
-%     plot3(x, y, z, 'o', 'color', 'y', 'markersize', 20, 'LineWidth',4)
-%     text(x - 1, y - 4, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
-%     
-%     TX = round([TX_coord(1), TX_coord(2), 0], 2);
-%     x = TX(1); y = TX(2); z = 0;
-%     txt = "[" + x + ", " + y + ", " + z + "]";
-%     plot3(x, y, z, 'o', 'color', 'y', 'markersize', 20, 'LineWidth',4)
-%     text(x - 1, y - 4, z, txt, 'FontSize', fs-10, 'FontWeight', 'bold') 
+%   Bounds for ionosphere_500km_series_plus
+    % grid_corner = [39, -106];
+    % plot3(grid_corner(1), grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
+    % plot3(grid_corner(1)+4, grid_corner(2), 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
+    % plot3(grid_corner(1), grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
+    % plot3(grid_corner(1)+4, grid_corner(2)+36, 0, 'x', 'color', 'k', 'markersize', 20, 'LineWidth',4, 'HandleVisibility', 'off')
 
     set(gca, 'XDir','reverse')
     hold off

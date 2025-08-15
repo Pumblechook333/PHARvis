@@ -7,10 +7,26 @@ clf
 %% Constants / Settings
 mode_keys = ["O", "X"];
 % r12_sel = [-1, 25, 50, 100, 200];
-r12_sel = [57];
+% r12_sel = [132, 145, 137, 113, 111, 104, 97, 74, 66, 57, 67]; % 2023 10 10-20
+% r12_sel = [78, 80, 84, 77, 55, 55, 90, 86, 120, 148, 171]; % 2024 04 05-15
+% r12_sel = [78, 80];
+r12_sel = 57;
+
 r12_sz = size(r12_sel);
 r12_sz = r12_sz(2);
-date = [2021 7 1 0 0];
+
+year = 2021;
+month = 7;
+days = [1];
+
+% year = 2023;
+% month = 10;
+% days = 10:1:20;
+
+% year = 2024;
+% month = 04;
+% days = 5:1:15;
+% days = [5, 6];
 
 el_start = 0;
 
@@ -19,7 +35,7 @@ if hi_res
     el_inc = 0.2;
     el_stop = 50;
 else
-    el_inc = 5;
+    el_inc = 2;
     el_stop = 50;
 end
 
@@ -37,10 +53,12 @@ for r12_i = 1:1:r12_max
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % GET necessary vars
     R12 = r12_sel(r12_i);
-
+    date = [year month days(r12_i) 0 0];
+    
+    date_string = " || " + year + "-" + month + "-" + days(r12_i);
+    r12_string = " || R12: " + R12;
     elevs_string = " || Initial Elevations: " ...
                    + el_start + ":" + el_inc + ":" + el_stop;
-    r12_string = " || R12: " + R12;
     
     obj_O = IONS(date, elevs, freq, R12, 1, gen, brk);
     obj_X = IONS(date, elevs, freq, R12, -1, gen, brk);
@@ -131,8 +149,8 @@ for r12_i = 1:1:r12_max
     
     set(gca,"FontSize",20)
 
-    ti = "Percentage of Recieved Rays by Number of Hops";
-    title(ti+elevs_string+r12_string)
+    ti = "Ray Hop Breakdown";
+    title(ti+date_string+elevs_string+r12_string)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % SAVE PLOTS if high res

@@ -3,9 +3,9 @@
 clc;
 clear;
 
-saveplots = 0;          % Toggle saving plots in local repository
-showplots = 1;          % Toggle showing plots in seperate windows
-debug = 1;              % Toggle for light / heavy settings
+saveplots = 1;          % Toggle saving plots in local repository
+showplots = 0;          % Toggle showing plots in seperate windows
+debug = 0;              % Toggle for light / heavy settings
 if debug
     fprintf(['DEBUG MODE: ON' newline newline])
     elevs = 0:2:30;     % Range of elevations for rays
@@ -72,7 +72,8 @@ start_height = 0 ;      % start height for ionospheric grid (km)
 height_inc = 3;         % height increment (km)
 num_heights = 200;      % number of  heights (must be < 2000)
 
-colors = ['r' 'g' 'b']; % Colors for different hops
+% colors = ['r' 'g' 'b']; % Colors for different hops
+colors = ['m' 'y' 'c']; % Colors for different hops
 gen = 0;                % Toggle 2D ionosphere generate / load
 
 %%
@@ -195,6 +196,8 @@ for i = hours
     plot_ray_iono_slice(iono_pf_subgrid, start_range, end_range, range_inc, ...
         start_ht, end_ht, height_inc, in_range_rays, 'color', [1, 1, 0.99], ...
         'linewidth', 2);
+
+    colormap gray
     
     % Resize figure to screen if showing
     if showplots
@@ -208,13 +211,13 @@ for i = hours
     
     % Color the traced ray according to its nhops
     if flags(1) > 0
-        set(ray_handle(1:flags(1)), 'color', 'r'); 
+        set(ray_handle(1:flags(1)), 'color', colors(1)); 
     end
     if flags(2) > flags(1)
-        set(ray_handle(flags(1)+1:flags(2)), 'color', 'g');
+        set(ray_handle(flags(1)+1:flags(2)), 'color', colors(2));
     end
     if flags(3) > flags(2)
-        set(ray_handle(flags(2)+1:flags(3)), 'color', 'b');
+        set(ray_handle(flags(2)+1:flags(3)), 'color', colors(3));
     end
     
     % Plot a red line at fractions from center vertical
@@ -237,7 +240,7 @@ for i = hours
     ax.Colorbar.Position(2) = 65;
 
     % Path to 2d raytrace plots
-    dirname = "PLOTS/2d_raytrace_combined/";
+    dirname = "PLOTS/2d_raytrace_combined_new/";
     filename = dirname + "Z" + UT(4) + "_" + UT(5)+ ".png";
     if saveplots
         set(gcf, 'paperorientation', 'portrait')
