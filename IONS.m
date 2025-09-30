@@ -7,8 +7,6 @@ classdef IONS
         
         % Bottom left corner of grid (lat, lon) in [deg]
         grid_corner = [39, -106];
-%         grid_corner = [40, -(105+(48/60))];
-%         grid_corner = [36, -110];
 
     end
     
@@ -410,6 +408,9 @@ classdef IONS
                                   self.mode, nhops, tol, iono_en_grid, iono_en_grid_5, ...
                                   collision_freq, self.iono_grid_parms, Bx, By, Bz, ...
                                   self.geomag_grid_parms);
+
+                    save("ray_data_N_" + nhops + "_" + i + "_.mat", 'ray_data_N');
+                    save("ray_N_" + nhops + "_" + i + "_.mat", 'ray_N');
                     
                     tmp = zeros(1,num_elevs);
                     ray_props = repmat(tmp, nprops, 1);

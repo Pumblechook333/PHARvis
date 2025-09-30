@@ -9,7 +9,7 @@ debug = 0;              % Toggle for light / heavy settings
 if debug
     fprintf(['DEBUG MODE: ON' newline newline])
     elevs = 0:2:30;     % Range of elevations for rays
-    hours = 0:1:0;      % number of hours (from zero) to generate
+    hours = 15:1:16;      % number of hours (from zero) to generate
     nhops = 1:1:3;      % number of hops to raytrace
 else
     fprintf(['DEBUG MODE: OFF' newline newline])
@@ -72,8 +72,10 @@ start_height = 0 ;      % start height for ionospheric grid (km)
 height_inc = 3;         % height increment (km)
 num_heights = 200;      % number of  heights (must be < 2000)
 
-% colors = ['r' 'g' 'b']; % Colors for different hops
-colors = ['m' 'y' 'c']; % Colors for different hops
+% colors = ['m' 'y' 'c']; % Colors for different hops
+colors = ["#F05039" "#EEBAB4" "#3D65A5"]; % Colors for different hops
+
+
 gen = 0;                % Toggle 2D ionosphere generate / load
 
 %%
@@ -211,13 +213,13 @@ for i = hours
     
     % Color the traced ray according to its nhops
     if flags(1) > 0
-        set(ray_handle(1:flags(1)), 'color', colors(1)); 
+        set(ray_handle(1:flags(1)), 'color', colors(1), 'linestyle', '-'); 
     end
     if flags(2) > flags(1)
-        set(ray_handle(flags(1)+1:flags(2)), 'color', colors(2));
+        set(ray_handle(flags(1)+1:flags(2)), 'color', colors(2), 'linestyle', '--');
     end
     if flags(3) > flags(2)
-        set(ray_handle(flags(2)+1:flags(3)), 'color', colors(3));
+        set(ray_handle(flags(2)+1:flags(3)), 'color', colors(3), 'linestyle', '-.');
     end
     
     % Plot a red line at fractions from center vertical
@@ -240,8 +242,8 @@ for i = hours
     ax.Colorbar.Position(2) = 65;
 
     % Path to 2d raytrace plots
-    dirname = "PLOTS/2d_raytrace_combined_new/";
-    filename = dirname + "Z" + UT(4) + "_" + UT(5)+ ".png";
+    dirname = "PLOTS/2d_raytrace_combined_cb/";
+    filename = dirname + "Z" + UT(4) + "_" + UT(5)+ ".jpg";
     if saveplots
         set(gcf, 'paperorientation', 'portrait')
         % Adjust paperposition to change size of printed plot: 
@@ -253,7 +255,7 @@ for i = hours
                     mkdir(dirname)
         end
         
-        print(filename, '-dpng');   % Save the figure to specified path
+        print(filename, '-djpeg', '-r300');   % Save the figure to specified path
     end
 end
 
