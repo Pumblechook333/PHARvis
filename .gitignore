@@ -8,7 +8,7 @@
 *.zip
 
 PLOTS/
-IONO/
+IONO_archive/
 EXPORT/
 misc_scripts/
 
