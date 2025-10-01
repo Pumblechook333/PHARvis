@@ -1,5 +1,4 @@
 
-*.mat
 *.asv
 *.\idea
 *.jpg
@@ -11,4 +10,5 @@ PLOTS/
 IONO_archive/
 EXPORT/
 misc_scripts/
-
+all_ray_data_2021_07_01/
+rays/
