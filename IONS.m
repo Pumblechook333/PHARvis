@@ -1,13 +1,12 @@
 classdef IONS
     properties(Constant)
-        % R12 = -1;            % Autoselect sunspot number
-        doppler_flag = 0;    % Not interested in Doppler shift
+        % R12 = -1;                                 % Autoselect sunspot number
+        doppler_flag = 0;                           % Not interested in Doppler shift
         TX_coord = [40.67583063, -105.038933178];   % WWV Station
         RX_coord = [40.742018, -74.178975];         % K2MFF Station
         
         % Bottom left corner of grid (lat, lon) in [deg]
         grid_corner = [39, -106];
-
     end
     
     properties
@@ -203,9 +202,9 @@ classdef IONS
             %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             % Coordinates of Towers
 
-            self.origin_lat = self.TX_coord(1);             % latitude of the start point of rays
-            self.origin_lon = self.TX_coord(2);            % longitude of the start point of rays
-            self.origin_ht = 0.0;                % altitude of the start point of rays
+            self.origin_lat = self.TX_coord(1);     % latitude of the start point of rays
+            self.origin_lon = self.TX_coord(2);     % longitude of the start point of rays
+            self.origin_ht = 0.0;                   % altitude of the start point of rays
             self.receiver_lat = self.RX_coord(1); 
             self.receiver_lon = self.RX_coord(2);
 
@@ -224,7 +223,7 @@ classdef IONS
             % Ionospheric Grid Parameters
 
             ht_start = ht_p(1);          % start height for ionospheric grid (km)
-            ht_inc = ht_p(2);             % height increment (km)
+            ht_inc = ht_p(2);            % height increment (km)
             num_ht = ht_p(3);     
             iono_ht = ht_inc * (num_ht - 1);
             self.iono_height = iono_ht;
@@ -249,7 +248,7 @@ classdef IONS
             % Magnetospheric Grid Parameters
 
             B_ht_start = ht_start;          % start height for geomagnetic grid (km)
-            B_ht_inc = ht_inc;                  % height increment (km)
+            B_ht_inc = ht_inc;              % height increment (km)
             B_num_ht = ceil(num_ht .* ht_inc ./ B_ht_inc);
 
             B_lat_start = lat_start;
