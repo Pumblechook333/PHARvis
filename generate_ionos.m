@@ -1,45 +1,46 @@
 % Script meant to be used to generate various ionospheres based on 
 % Different R12 values
 
+%%
+% Clear console output and memory
+
 clear
 clc
 fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
-
 clf
 
-% 2023 10 10-20
-% year = 2023;
-% month = 10;
-% days = 10:1:20;
-% R12s = [132, 145, 137, 113, 111, 104, 97, 74, 66, 57, 67]; % 2023 10 10-20
+%%
+% Define parameters for generation
 
-% 2024 04 05-15
-year = 2024;
-month = 04;
-days = 5:1:15;
-R12s = [78, 80, 84, 77, 55, 55, 90, 86, 120, 148, 171];
+% ~~~~~~~
+% Dummy values to be passed into IONOS constructor - does not affect
+% ionosphere generation
+date = [0 0 0 0 0]; % Date UTC [YYYY MM DD hh mm]
+elevs = [0 1 1];    % Elevation of simulated rays (°)
+freq = 10;          % Frequency of simulated rays (MHz)
+mode = 1;           % Mode of simulated rays ('X' or 'O' mode)
+brk = 0;            % Toggle generation of ray breakdown
+% ~~~~~~~
 
+% R12 values to be simulated
+R12s = [10, 100];
 
-% for day = 1:1:11
-for day = 5:1:5
-    % for r12_i = 1:1:r12_max
-    %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    % GET necessary vars
+% Height range, lat range and lon range of ionosphere
+% [Start, increment, number of increments]
+ht_p  = [0, 4, (24 +1)];   % Height of sim ionosphere (km)
+lat_p = [39, 0.5, 4];       % Length of sim ionosphere (° latitude N-S)
+lon_p = [-106, 1.0, 10];    % Width of sim ionosphere (° longitude E-W)
 
-    date = [year month days(day) 0 0];
+% Final toggle to generate ionosphere through IONOS object
+% 0 = Do not Generate, 1 = Generate
+gen = 0; 
 
-    fprintf(mat2str(date))
+%%
+% Core loop - repeat ionosphere generation per R12 value
 
-    el_start = 0;
-    el_inc = 0.1;
-    el_stop = 50;
-    elevs = el_start : el_inc : el_stop;
+for sunspot_ind = 1:1:length(R12s)
+    R12 = R12s(sunspot_ind);
+    fprintf("Simulating R12 value: " + R12 + "\n\n")
 
-    freq = 10;
-    R12 = R12s(day);
-    mode = 'O';
-    gen = 1; % 0 = no gen, 1 = gen
-    
-    obj = IONS(date, elevs, freq, R12, mode, gen);
-
+    obj = IONS(date, elevs, freq, R12, mode, gen, brk, ht_p, lat_p, lon_p);
 end

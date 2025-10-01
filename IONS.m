@@ -148,15 +148,19 @@ classdef IONS
     
     methods
         % Initialization
-        function self = IONS(date, elevs, freq, R12, mode, gen, brk)
+        function self = IONS(date, elevs, freq, R12, mode, gen, brk, ht_p, ...
+                lat_p, lon_p)
             arguments
-                date = [2021 7 1 0 0]
-                elevs = 0:5:90
-                freq = 10
-                R12 = -1
-                mode = 1
-                gen = 0
-                brk = false
+                date = [2021 7 1 0 0]     % UT datetime [YYYY MM DD hh mm]
+                elevs = 0:5:90              % Elevation array (°)
+                freq = 10                   % Simulated ray frequency
+                R12 = -1                    % R12 value (-1 = autoselect)
+                mode = 1                    % Bool for "X" or "O" mode rays
+                gen = 0                     % Bool to toggle ionosphere generation
+                brk = false                 % Bool to perform ray_breakdown
+                ht_p  = [0, 4, (125 +1)];   % Height of sim ionosphere (km)
+                lat_p = [39, 0.5, 4];       % Length of sim ionosphere (° latitude N-S)
+                lon_p = [-106, 1.0, 36];    % Width of sim ionosphere (° longitude E-W)
             end
             %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             % General Parameters
@@ -187,7 +191,7 @@ classdef IONS
                                  self.receiver_lat, self.receiver_lon);
             self.ray_bears = ones(size(self.elevs))*ray_bear;
             
-            self = self.iono_parms();
+            self = self.iono_parms(ht_p, lat_p, lon_p);
             self = self.gl_iono(gen);
             
             if brk 
@@ -408,8 +412,9 @@ classdef IONS
                                   collision_freq, self.iono_grid_parms, Bx, By, Bz, ...
                                   self.geomag_grid_parms);
 
-                    save("ray_data_N_" + nhops + "_" + i + "_.mat", 'ray_data_N');
-                    save("ray_N_" + nhops + "_" + i + "_.mat", 'ray_N');
+                    % Debug - Save rays for further analysis
+                    % save("ray_data_N_" + nhops + "_" + i + "_.mat", 'ray_data_N');
+                    % save("ray_N_" + nhops + "_" + i + "_.mat", 'ray_N');
                     
                     tmp = zeros(1,num_elevs);
                     ray_props = repmat(tmp, nprops, 1);
