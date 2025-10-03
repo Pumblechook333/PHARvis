@@ -94,6 +94,11 @@ for mode_key_i = 1:1:2
     end
 end
 
+
+%% 
+% Function to convert cell array output from IONS into format exportable 
+% to .csv format 
+
 function stringMatrix = cellArrayToStringMatrix(cellArray)
 
 if ~iscell(cellArray)

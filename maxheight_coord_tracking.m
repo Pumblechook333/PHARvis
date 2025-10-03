@@ -1,16 +1,29 @@
+% Plots a map of maximum height locations for received rays.
+
+%%
+% Clear console output and memory
+
 clear
 clc
-fprintf("~~~~~ " + mfilename + " ~~~~~ \n")
+fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
+clf
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% GET necessary vars
+%%
+% GET necessary vars from IONS object
 
 date = [2021 7 1 0 0];
-% elevs = 0:0.2:90;
 elevs = 0:2:90;
 freq = 10;
+R12 = 57;
+mode = 0;
+gen = 0;
+brk = 0;
 
-obj = IONS(date, elevs, freq, 57, 0, 0, 0);
+ht_p  = [0, 4, (125 +1)];
+lat_p = [39, 0.5, 4];
+lon_p = [-106, 1.0, 36];
+
+obj = IONS(date, elevs, freq, R12, mode, gen, brk, ht_p, lat_p, lon_p);
 
 iono_series = obj.get_iono_series();
 
@@ -33,8 +46,8 @@ TX_coord = c.TX_coord;
 
 ray_bears = obj.get_bearing();
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% Plotting
+%%
+% Loop to raytrace and process height and coordinate data before plotting
 
 rsta = 1;
 rinc = 1;
@@ -113,6 +126,9 @@ for nhops = 1:1:nhop_max
     % finished ray tracing with this ionosphere so clear it out of memory
     clear raytrace_3d
 end
+
+%%
+% Plotting max height, lat and lon
 
 clf
 figure(1)

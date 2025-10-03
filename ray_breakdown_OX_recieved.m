@@ -1,15 +1,16 @@
-%% Setup
+% Plots breakdown of ray mode recieved for a given R12 value over the
+% course of a 24-hour period
+
+%%
+% Clear console output and memory
+
 clear
 clc
 fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
-
 clf
+
 %% Constants / Settings
 mode_keys = ["O", "X"];
-% r12_sel = [-1, 25, 50, 100, 200];
-% r12_sel = [132, 145, 137, 113, 111, 104, 97, 74, 66, 57, 67]; % 2023 10 10-20
-% r12_sel = [78, 80, 84, 77, 55, 55, 90, 86, 120, 148, 171]; % 2024 04 05-15
-% r12_sel = [78, 80];
 r12_sel = 57;
 
 r12_sz = size(r12_sel);
@@ -18,15 +19,6 @@ r12_sz = r12_sz(2);
 year = 2021;
 month = 7;
 days = [1];
-
-% year = 2023;
-% month = 10;
-% days = 10:1:20;
-
-% year = 2024;
-% month = 04;
-% days = 5:1:15;
-% days = [5, 6];
 
 el_start = 0;
 
@@ -40,9 +32,7 @@ else
 end
 
 elevs = el_start : el_inc : el_stop;
-
 freq = 10;
-
 gen = 0; % 0 = no gen, 1 = gen
 brk = true;
 

@@ -9,8 +9,7 @@ fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
 clf
 
 %%
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% GET necessary vars from IONOS object
+% GET necessary vars from IONS object
 
 date = [2021 7 1 0 0];
 elevs = 0:2:90;
@@ -43,7 +42,6 @@ TX_coord = c.TX_coord;
 ray_bears = obj.get_bearing();
 
 %%
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Plotting
 
 rsta = 1;

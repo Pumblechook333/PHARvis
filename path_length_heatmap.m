@@ -1,0 +1,137 @@
+% This script creates a heatmap of the ratio of ground range to geometric 
+% path length, calculated per hop, per hour, and per angle of elevation
+
+%%
+% Clear console output and memory
+
+clear
+clc
+fprintf("~~~~~ " + mfilename + " ~~~~~ \n\n")
+clf
+
+%% Settings
+
+date = [2021 7 1 0 0];
+
+el_start = 0;
+
+hi_res = 0;
+if hi_res
+    el_inc = 0.1;
+    el_stop = 50;
+else
+    el_inc = 5;
+    el_stop = 90;
+end
+
+elevs = el_start : el_inc : el_stop;
+
+freq = 10;
+
+mode_keys = ["O"];
+R12_sel = [57];
+mode_map = struct('O', 1, 'No', 0, 'X', -1);
+gen = 0; % 0 = no gen, 1 = gen ionosphere
+
+%%
+% Loop plotting per mode, per R12
+
+count = 1;
+for mode_key_i = 1:1:length(mode_keys)
+    for r12_i = 1:1:length(R12_sel)
+        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        % GET necessary vars
+
+        R12 = R12_sel(r12_i);
+        mode_key = mode_keys(mode_key_i);
+        mode = mode_map.(mode_key);
+
+        elevs_string = " || Initial Elevations: " ...
+                       + el_start + ":" + el_inc + ":" + el_stop;
+        r12_string = " || R12: " + R12;
+        mode_string = " || " + mode_key + "-mode";
+        
+        obj = IONS(date, elevs, freq, R12, mode, gen);
+
+        iono = obj.get_iono_parms();
+
+        g = obj.get_gen_params();
+        elevs = g.elevs;
+
+        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        % Raytracing
+        
+        %.ground_range          - geodetic (WGS84) ground range (Km) 
+        %.geometric_path_length - Geometrical distance travelled by ray (km)
+        
+        props = [["ground_range", "ray_data"];
+                 ["geometric_path_length", "ray_data"]];
+        rps = obj.ray_props(props);
+
+        ground_range = rps.(props(1));
+        geometric_path_length = rps.(props(2));
+
+        %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        % Plotting
+        fprintf("\nPlotting Figure " + count + "\n")
+        figure(count)
+
+        hr_range = 0:1:24;
+        elevs_range = flip(elevs);
+
+        nhop_max = 4;
+        for nhops = 1:1:nhop_max
+            subplot(2,2,nhops)
+
+            hop_field = "hop_" + nhops;
+            fprintf("Plotting " + nhops + "-hop rays \n")
+
+            ratio = cell2mat(ground_range.(hop_field)) ./ cell2mat(geometric_path_length.(hop_field));
+            ratio(isnan(ratio)) = 0;
+            ratio = ratio.';
+            ratio = flip(ratio);
+
+            h = heatmap(hr_range, elevs_range, ratio, 'ColorLimits', [0.7 1.0], ...
+                        'Colormap', jet);
+
+            warning('off', 'MATLAB:structOnObject')
+            hs = struct(h);
+            ylabel(hs.Colorbar, "Ground Range (km) / Geometric Path Length (km)");
+
+            h.Title = "Number of Hops:" + nhops;
+            h.XLabel = 'Time (UT)';
+            h.YLabel = 'Elevation (°)';
+            h.GridVisible = 'off';
+
+            % Convert each number in the array into a string
+            CustomYLabels = string(elevs_range);
+            % Replace all but the 10th elements by spaces
+            CustomYLabels(mod(elevs_range,10) ~= 0) = " ";
+            % Set the 'XDisplayLabels' property of the heatmap 
+            % object 'h' to the custom x-axis tick labels
+            h.YDisplayLabels = CustomYLabels;
+
+        end
+
+        ti = "Ground Range / Geometric Path Length Per Elevation Per Hour";
+        sgtitle(ti+elevs_string+r12_string+mode_string)
+        set(gcf, 'Position', get(0, 'Screensize') / 1.1);
+        
+        dirname = "path_length_heatmaps_end/";
+        if not(isfolder(dirname))
+                    mkdir(dirname)
+        end
+        
+        if hi_res
+            set(gcf,'visible','off')
+            figname = "figure_" + R12 + "_" + mode_key + ".jpg";
+            sppi = get(groot,"ScreenPixelsPerInch");
+            exportgraphics(gcf, dirname+figname, 'Resolution', sppi)
+        end
+
+        count = count +1;
+    end
+end
+
+
+
